@@ -18,6 +18,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 	//$img        =   $_POST[''];
 
 #TODO thumbnails
+
 	$new_post = array(
 			'ID' => '',
 			'post_title' => $title,
@@ -39,7 +40,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 	$post = get_post($post_id);
 	//wp_redirect($post->guid);
 }
+#TODO timepicker
 ?>
+
 
 <form id="new_incident" name="new_incident" method="POST" action="">
 	<div class="form-group">
@@ -89,6 +92,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 	<button type="submit" class="btn btn-default">Submit</button>
 </form>
 
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAy0ToSXwXcKiePTSv48hRVL-9DnYQyZTA&sensor=false&amp;libraries=places"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="wp-content/plugins/incident/assets/js/jquery.geocomplete.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js'></script>
+
+
 <script>
 
 	//autocomplete google api function
@@ -101,12 +113,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 		});
 
 	});
+
+	jQuery('.timepicker').timepicker({
+		timeFormat: 'HH:mm ',
+		interval: 1,
+		minTime: '00',
+		maxTime: '23',
+		defaultTime: 'now',
+		startTime: '00',
+		dynamic: false,
+		dropdown: true,
+		scrollbar: true
+	});
+
 </script>
-
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAy0ToSXwXcKiePTSv48hRVL-9DnYQyZTA&sensor=false&amp;libraries=places"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="wp-content/plugins/incident/assets/js/jquery.geocomplete.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.js'></script>
-<script src='https://www.google.com/recaptcha/api.js'></script>
-
-
