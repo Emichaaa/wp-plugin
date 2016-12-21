@@ -15,9 +15,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 	$not_time   =   $_POST['notification_time'];
 	$dang_level =   $_POST['dangerous_level'];
 	$phone      =   $_POST['customer_phone'];
-	//$img        =   $_POST[''];
 
-#TODO thumbnails
+	$uploaddir = wp_upload_dir();
+	$file = $_FILES['image'];
+	$uploadfile = $uploaddir['path'] . '/' . basename( $file['name'] );
+
+	move_uploaded_file( $file['tmp_name'] , $uploadfile );
+	$filename = basename( $uploadfile );
+
+	$wp_filetype = wp_check_filetype(basename($filename), null );
+
+	$attachment = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
+			'post_content' => '',
+			'post_status' => 'inherit',
+			'menu_order' => 0
+	);
+	$attach_id = wp_insert_attachment( $attachment, $uploadfile );
 
 	$new_post = array(
 			'ID' => '',
@@ -30,12 +45,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 					'custom_select'             => $dang_level,
 					'custom_date'               => $inc_time,
 					'custom_date-notification'  => $not_time,
-					'_thumbnail_id'             => $title
+					'_thumbnail_id'             => $attach_id
 			)
 	);
 
 	$post_id = wp_insert_post($new_post);
-
+	set_post_thumbnail( $post_id, $attach_id );
 	// This will redirect you to the newly created post
 	$post = get_post($post_id);
 	//wp_redirect($post->guid);
@@ -44,7 +59,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 ?>
 
 
-<form id="new_incident" name="new_incident" method="POST" action="">
+<form id="new_incident" name="new_incident" method="POST" action=""  enctype="multipart/form-data">
 	<div class="form-group">
 		<label for="incident_location">Location:</label>
 		<input type="text" class="form-control" name="incident_location" id="incident_location" placeholder="Ex. Sofia">
