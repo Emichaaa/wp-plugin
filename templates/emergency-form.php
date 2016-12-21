@@ -38,7 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 			'ID' => '',
 			'post_title' 	=> $title,
 			'post_status' 	=> 'publish',
-			'post_type'   	=> 'incidents',
+			'post_type'   	=> 'incident',
 			'meta_input' 	=> array(
 					'custom_location-lat'       => $lat,
 					'custom_location-lng'       => $lng,
@@ -53,10 +53,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 	$post_id = wp_insert_post($new_post);
 	set_post_thumbnail( $post_id, $attach_id );
 	// This will redirect you to the newly created post
-	$post = get_post($post_id);
-	//wp_redirect($post->guid);
+	#TODO that is not right way
+	echo "<script>window.location.href='?incident=incident-".date("Hi")."'</script>";
+
 }
-#TODO timepicker
+
 ?>
 
 

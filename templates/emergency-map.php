@@ -12,7 +12,7 @@ $args = array(
     'posts_per_page'   => -1,
     'orderby'          => 'date',
     'order'            => 'DESC',
-    'post_type'        => 'incidents',
+    'post_type'        => 'incident',
     'post_status'      => 'publish'
 );
 $posts_array = get_posts( $args );

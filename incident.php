@@ -37,7 +37,7 @@ function incident_plugin_deactivation()
 function incident_move_templates(){
     copy(dirname(__FILE__).'/templates/emergency-form.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-form.php');
     copy(dirname(__FILE__).'/templates/emergency-map.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php');
-    copy(dirname(__FILE__).'/templates/single-incidents.php', get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
+    copy(dirname(__FILE__).'/templates/single-incident.php', get_template_directory().DIRECTORY_SEPARATOR.'single-incident.php');
 }
 
 
@@ -49,8 +49,8 @@ function incident_delete_templates(){
     if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php')){
        unlink(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php');
     }
-    if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php')){
-        unlink(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
+    if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'single-incident.php')){
+        unlink(get_template_directory().DIRECTORY_SEPARATOR.'single-incident.php');
     }
 }
 
@@ -60,9 +60,10 @@ function incident_delete_templates(){
 add_action('init', 'incident_register_custom_posts_init');
 function incident_register_custom_posts_init() {
     $products_labels = array(
-        'name'               => 'Incidents',
-        'singular_name'      => 'Incidents',
-        'menu_name'          => 'Incidents',
+        'name'               => 'Incident',
+        'singular_name'      => 'Incident',
+        'menu_name'          => 'Incident',
+        'menu_icon'          => 'dashicons-plus-alt'
     );
     $products_args = array(
         'labels'             => $products_labels,
@@ -71,7 +72,7 @@ function incident_register_custom_posts_init() {
         'has_archive'        => true,
         'supports'           => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' )
     );
-    register_post_type('incidents', $products_args);
+    register_post_type('incident', $products_args);
 }
 
 
@@ -82,7 +83,7 @@ function incident_add_custom_meta_box() {
         'custom_meta_box', // $id
         'Custom Meta Box', // $title
         'incident_show_custom_meta_box', // $callback
-        'incidents', // $page
+        'incident', // $page
         'normal',
         'high');
 }
@@ -242,7 +243,7 @@ function incident_load_admin_footer_scripts(){
 
     $screen = get_current_screen();
 
-    if( is_object( $screen ) && $screen->post_type == "incidents" )
+    if( is_object( $screen ) && $screen->post_type == "incident" )
 
     echo "
         <script type='text/javascript'>
@@ -269,7 +270,7 @@ add_action('admin_enqueue_scripts', 'incident_enqueue_admin_scripts');
 function incident_enqueue_admin_scripts( $hook_suffix ){
 
 
-    $custom_post_type = "incidents";
+    $custom_post_type = "incident";
 
     if( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) ){
 
