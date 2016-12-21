@@ -8,7 +8,7 @@
 get_header();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
-	$title      =   'Incident';
+	$title      =   'Incident-'.date("H:i");
 	$lat		=   $_POST['lat'];
 	$lng		=   $_POST['lng'];
 	$inc_time   =   $_POST['incident_time'];
@@ -36,9 +36,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 
 	$new_post = array(
 			'ID' => '',
-			'post_title' => $title,
-			'post_status' => 'publish',
-			'meta_input' => array(
+			'post_title' 	=> $title,
+			'post_status' 	=> 'publish',
+			'post_type'   	=> 'incidents',
+			'meta_input' 	=> array(
 					'custom_location-lat'       => $lat,
 					'custom_location-lng'       => $lng,
 					'custom_text'               => $phone,

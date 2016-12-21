@@ -25,7 +25,8 @@ get_header();
 $meta 			= get_post_meta( get_the_ID());
 $img_post_id 	= $meta['_thumbnail_id'][0];
 $danger_level	= $meta['custom_select'][0];
-$location		= $meta['custom_location'][0];
+$lat			= $meta['custom_location-lat'][0];
+$lng			= $meta['custom_location-lng'][0];
 $phone			= $meta['custom_text'][0];
 $incident_time	= $meta['custom_date'][0];
 $notification	= $meta['custom_date-notification'][0];
@@ -78,8 +79,8 @@ if(isset($type_incident) && !empty($type_incident)){
 
 		function initMap() {
 			var map = new google.maps.Map(document.getElementById('map'), {
-				zoom: 4,
-				center: {lat: -33, lng: 151},
+				zoom: 15,
+				center: {lat: <?php echo $lat; ?>, lng: <?php echo $lng; ?>},
 				scrollwheel: false
 			});
 
@@ -106,7 +107,7 @@ if(isset($type_incident) && !empty($type_incident)){
 				anchor: new google.maps.Point(0, 32)
 			};
 			var marker = new google.maps.Marker({
-				position: {lat: -33.890, lng: 151.274},
+				position: {lat: <?php echo $lat; ?>, lng: <?php echo $lng; ?>},
 				map: map,
 				icon: image
 			});
