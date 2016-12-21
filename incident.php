@@ -17,11 +17,11 @@ function incident_plugin_activation()
 {
     if (!file_exists(get_template_directory().DIRECTORY_SEPARATOR.'templates')) {
         if(mkdir(get_template_directory().DIRECTORY_SEPARATOR.'templates', 0777, true)){
-            move_templates();
+            incident_move_templates();
         }
     }
     else {
-        move_templates();
+        incident_move_templates();
     }
 }
 
@@ -30,7 +30,7 @@ function incident_plugin_activation()
 register_deactivation_hook( __FILE__, 'incident_plugin_deactivation' );
 function incident_plugin_deactivation()
 {
-    delete_templates();
+    incident_delete_templates();
 }
 
 #copy template files from plugin directory to theme directory
@@ -38,7 +38,6 @@ function incident_move_templates(){
     copy(dirname(__FILE__).'/templates/emergency-form.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-form.php');
     copy(dirname(__FILE__).'/templates/emergency-map.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php');
     copy(dirname(__FILE__).'/templates/single-incidents.php', get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
-    copy(dirname(__FILE__).'/assets/js/squery.geocomplete.js', get_template_directory().DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'squery.geocomplete.js');
 }
 
 
@@ -53,7 +52,6 @@ function incident_delete_templates(){
     if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php')){
         unlink(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
     }
-
 }
 
 

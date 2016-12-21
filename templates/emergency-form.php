@@ -105,7 +105,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty( $_POST['action'] )) {
 
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAy0ToSXwXcKiePTSv48hRVL-9DnYQyZTA&sensor=false&amp;libraries=places"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="wp-content/themes/twentyseventeen/assets/js/jquery.geocomplete.js"></script>
+<script src="wp-content/plugins/incident/assets/js/jquery.geocomplete.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.js'></script>
 <script src='https://www.google.com/recaptcha/api.js'></script>
 
