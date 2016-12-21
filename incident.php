@@ -11,9 +11,9 @@ License: A "Slug" license name e.g. GPL2
 */
 
 
-#Call function only on activate plugin
-register_activation_hook( __FILE__, 'plugin_activation' );
-function plugin_activation()
+#Call function incident_only on activate plugin
+register_activation_hook( __FILE__, 'incident_plugin_activation' );
+function incident_plugin_activation()
 {
     if (!file_exists(get_template_directory().DIRECTORY_SEPARATOR.'templates')) {
         if(mkdir(get_template_directory().DIRECTORY_SEPARATOR.'templates', 0777, true)){
@@ -26,27 +26,32 @@ function plugin_activation()
 }
 
 
-#Call function only on deactivate plugin
-register_deactivation_hook( __FILE__, 'plugin_deactivation' );
-function plugin_deactivation()
+#Call function incident_only on deactivate plugin
+register_deactivation_hook( __FILE__, 'incident_plugin_deactivation' );
+function incident_plugin_deactivation()
 {
     delete_templates();
 }
 
 #copy template files from plugin directory to theme directory
-function move_templates(){
+function incident_move_templates(){
     copy(dirname(__FILE__).'/templates/emergency-form.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-form.php');
     copy(dirname(__FILE__).'/templates/emergency-map.php', get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php');
+    copy(dirname(__FILE__).'/templates/single-incidents.php', get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
+    copy(dirname(__FILE__).'/assets/js/squery.geocomplete.js', get_template_directory().DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'squery.geocomplete.js');
 }
 
 
 #delete templates from theme directory
-function delete_templates(){
+function incident_delete_templates(){
     if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-form.php')){
         unlink(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-form.php');
     }
     if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php')){
        unlink(get_template_directory().DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'emergency-map.php');
+    }
+    if(file_exists(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php')){
+        unlink(get_template_directory().DIRECTORY_SEPARATOR.'single-incidents.php');
     }
 
 }
@@ -54,8 +59,8 @@ function delete_templates(){
 
 #call function to create new custom posts
 #TODO - icon
-add_action('init', 'register_custom_posts_init');
-function register_custom_posts_init() {
+add_action('init', 'incident_register_custom_posts_init');
+function incident_register_custom_posts_init() {
     $products_labels = array(
         'name'               => 'Incidents',
         'singular_name'      => 'Incidents',
@@ -72,13 +77,13 @@ function register_custom_posts_init() {
 }
 
 
-#call function to create new meta boxes
-add_action('add_meta_boxes', 'add_custom_meta_box');
-function add_custom_meta_box() {
+#call function incident_to create new meta boxes
+add_action('add_meta_boxes', 'incident_add_custom_meta_box');
+function incident_add_custom_meta_box() {
     add_meta_box(
         'custom_meta_box', // $id
         'Custom Meta Box', // $title
-        'show_custom_meta_box', // $callback
+        'incident_show_custom_meta_box', // $callback
         'incidents', // $page
         'normal',
         'high');
@@ -86,9 +91,14 @@ function add_custom_meta_box() {
 
 
 // Fields Array
-#TODO image
 $prefix = 'custom_';
 $custom_meta_fields = array(
+    array(
+        'label'=> 'Location',
+        'desc'  => 'Location.',
+        'id'    => $prefix.'location',
+        'type'  => 'location'
+    ),
     array(
         'label'=> 'Phone',
         'desc'  => 'Phone.',
@@ -133,30 +143,34 @@ $custom_meta_fields = array(
         'desc'  => 'Notificaton time.',
         'id'    => $prefix.'date-notification',
         'type'  => 'date-notification'
-    ),array(
-        'name'  => 'Image',
-        'desc'  => 'Upload image.',
-        'id'    => $prefix.'image',
-        'type'  => 'image'
     )
 );
 
 
 // The Callback from metabox - view
-function show_custom_meta_box() {
-    global $custom_meta_fields, $post;
+function incident_show_custom_meta_box() {
+    global $custom_meta_fields;
+    $screen = get_current_screen();
+    $post_id = $screen->id;
+
 // Use nonce for verification
     echo '<input type="hidden" name="custom_meta_box_nonce" value="'.wp_create_nonce(basename(__FILE__)).'" />';
 
     echo '<table class="form-table">';
     foreach ($custom_meta_fields as $field) {
         // get value of this field if it exists for this post
-        $meta = get_post_meta($post->ID, $field['id'], true);
+        $meta = get_post_meta($post_id, $field['id'], true);
 
         echo '<tr>
                 <th><label for="'.$field['id'].'">'.$field['label'].'</label></th>
                 <td>';
         switch($field['type']) {
+            // text
+            case 'location':
+                echo '<input type="text" name="'.$field['id'].'" id="'.$field['id'].'"  />
+                    <br /><span class="description">'.$field['desc'].'</span>';
+                break;
+
             // text
             case 'phone':
                 echo '<input type="tel" name="'.$field['id'].'" id="'.$field['id'].'"  />
@@ -183,15 +197,6 @@ function show_custom_meta_box() {
                 echo '<input type="text" class="timepicker" name="'.$field['id'].'" id="'.$field['id'].'" value="'.$meta.'" size="30" />
 			        <br /><span class="description">'.$field['desc'].'</span>';
                 break;
-
-            // image
-            case 'image':
-                if ($meta) { $image = wp_get_attachment_image_src($meta, 'medium');}
-                echo    '<input name="'.$field['id'].'" type="hidden" class="custom_upload_image" value="'.$meta.'" />
-                    <input class="custom_upload_image_button button" type="file" value="Choose Image" />
-                    <small> <a href="#" class="custom_clear_image_button">Remove Image</a></small>
-                    <br clear="all" /><span class="description">'.$field['desc'].'</span>';
-                break;
         } //end switch
         echo '</td></tr>';
     } // end foreach
@@ -200,8 +205,8 @@ function show_custom_meta_box() {
 
 
 // Save the Data from new fields
-add_action('save_post', 'save_custom_meta');
-function save_custom_meta($post_id) {
+add_action('save_post', 'incident_save_custom_meta');
+function incident_save_custom_meta($post_id) {
     global $custom_meta_fields;
 
     // verify nonce
@@ -232,16 +237,18 @@ function save_custom_meta($post_id) {
 
 
 #include jQuery script to visualization the timepicker
-add_action('admin_head','add_custom_scripts');
-function add_custom_scripts() {
-    global $custom_meta_fields, $post;
 
-    $output = '<script type="text/javascript">
-                jQuery(function() {';
+add_action('admin_print_footer_scripts','incident_load_admin_footer_scripts');
 
-    foreach ($custom_meta_fields as $field) { // loop through the fields looking for certain types
-        if($field['type'] == 'date')
-            $output .= "jQuery('.timepicker').timepicker({
+function incident_load_admin_footer_scripts(){
+
+    $screen = get_current_screen();
+
+    if( is_object( $screen ) && $screen->post_type == "incidents" )
+
+    echo "
+        <script type='text/javascript'>
+            jQuery('.timepicker').timepicker({
                             timeFormat: 'HH:mm ',
                             interval: 1,
                             minTime: '00',
@@ -251,22 +258,54 @@ function add_custom_scripts() {
                             dynamic: false,
                             dropdown: true,
                             scrollbar: true
-                        });";
-    }
-    $output .= '});
-        </script>';
-    echo $output;
-}
+            });
+        </script>
+    ";
 
+
+
+}
 
 #include required javascripts and stylesheets
-add_action('init', 'init_scripts');
-function init_scripts(){
+add_action('admin_enqueue_scripts', 'incident_enqueue_admin_scripts');
+function incident_enqueue_admin_scripts( $hook_suffix ){
 
-    wp_register_script('timepicker', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js');
-    wp_register_style( 'timepicker', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css' );
 
-    wp_enqueue_style('timepicker');
-    wp_enqueue_script( 'timepicker' );
+    $custom_post_type = "incidents";
+
+    if( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) ){
+
+        $screen = get_current_screen();
+
+        if( is_object( $screen ) && $screen->post_type == $custom_post_type ){
+
+            wp_register_script('timepicker', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js');
+            wp_register_style( 'timepicker', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css' );
+
+            wp_enqueue_style('timepicker');
+            wp_enqueue_script( 'timepicker' );
+
+        }
+
+    }
 
 }
+
+
+add_action( 'wp_enqueue_scripts', 'incident_add_scripts' );
+function incident_add_scripts(){
+    wp_register_script('jquery','https://code.jquery.com/jquery-3.1.1.min.js');
+    wp_register_script('bootstrap','https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js');
+    wp_enqueue_script( 'jquery' );
+    wp_enqueue_script( 'bootstrap' );
+}
+
+
+add_action( 'wp_enqueue_scripts', 'incident_add_stylesheet' );
+function incident_add_stylesheet(){
+    wp_register_style('bootstrap','https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+    wp_enqueue_style( 'bootstrap' );
+
+}
+
+
